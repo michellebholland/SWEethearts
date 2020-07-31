@@ -16,7 +16,7 @@ import '../node_modules/bootstrap/dist/css/bootstrap.css';
 const App = () => {
   const [authStatus, setAuthStatus] = useState({
     isLoggedIn: false,
-    username: 'friend',
+    username: 'michelle',
   });
 
   useEffect(() => {

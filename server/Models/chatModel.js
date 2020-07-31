@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+require('dotenv').config();
 const { MONGO_URI } = process.env;
 
 mongoose
@@ -17,10 +17,15 @@ const { Schema } = mongoose;
 
 // define message room schema
 const messageRoomSchema = new Schema({
-  user1: { type: String, required: true },
-  user2: { type: String, required: true },
+  users: [{ type: String, required: true }],
   // messages: ? separate schema to store each message object? 
-  messagesId: {MessageSchema}
+  messages: [{
+    sender: {type: String, required: true},
+    text: { 
+      type: String,
+      max: 2000
+    },
+  }]
 });
 
 const MessageRoom = mongoose.model('messageRoom', messageRoomSchema);

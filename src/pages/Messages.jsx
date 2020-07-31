@@ -8,9 +8,9 @@ import io from 'socket.io-client';
 let socket;
 const Messages = ({ authStatus }) => {
   const ENDPOINT = 'localhost:3000';
-  const name = authStatus.username || 'addescapecharhere?';
+  const username = authStatus.username || 'developer';
   // const { loaded, setLoaded } = useState('');
-  const [messageRooms, setMessageRooms] = useState('');
+  const [messageRooms, setMessageRooms] = useState([]);
   // currentRoom is the message_id, references 2 particpants
   // setRoom called onClick of list item
   const [room, setRoom] = useState('no one');
@@ -19,6 +19,7 @@ const Messages = ({ authStatus }) => {
   // current message - sent to server via socket
   const [message, setMessage] = useState('');
   // const [room, setRoom] = useState('')
+  // const [chatPartners, setChatPartners] = useState('')
 
   /** On component mount or room change **
    * 1. fetch list of messageRooms (IDs and partners) from DB - use to render message rooms
@@ -26,10 +27,11 @@ const Messages = ({ authStatus }) => {
    */
   useEffect(() => {
     // fetch data for list of messagesRooms and current room
-    // fetchData();
+    fetchData();
     socket = io(ENDPOINT);
     // emit 'join' event to server
-    socket.emit('join', { name, room }, ({ error }) => {
+    socket.emit('join', { username, room }, ({ error }) => {
+
       console.log('Error joining room', error);
     });
     // on disconnectioning from socket or leaving the current room
@@ -53,18 +55,32 @@ const Messages = ({ authStatus }) => {
   /* Method Defs */
 
   // on mount, fetch message data
-  // const fetchData = async () => {
-  //   const results = await fetch(`api/messages/${username}`);
-  //   setMessageRooms(results.data); // ? no idea what this data will look like
-  //   // setLoaded(true);
-  // };
+  const fetchData = () => {
+    fetch(`api/messages/${username}`)
+    .then(res => res.json())
+    .then(data => {
+      console.log('data', data)
+      // const setRooms = Object.assign([], data)
+      setMessageRooms(data); // ? an array of objects, each with 2 props (both arrays)
+      // setChatPartners(getChatPartners())
+      // setLoaded(true);
+    })
+  };
+
+  const changeRoom = (e) => {
+    console.log('room change', e.target.value);
+    setRoom(e.target.value);
+  };
 
   // create a list item for each messaging pair
-  // const chatPartners = messageRooms.map((room) => (
-  //   <ListGroup.Item key={room.id} value={room.id} onClick={changeRoom}>
-  //     {room.partner}
-  //   </ListGroup.Item>
-  // ));
+  const chatPartners = messageRooms.map((room) => {
+      let receiver = room.users[0] === username ? room.users[1] : room.users[0];
+     return ( <ListGroup.Item key={room.id}><Button value={room.id} onClick={changeRoom}>
+        {receiver}
+        </Button>
+      </ListGroup.Item> )
+  })
+
   // track text input in state
   const handleChange = (e) => setMessage(e.target.value);
   // send message to server (onclick)
@@ -73,10 +89,7 @@ const Messages = ({ authStatus }) => {
     socket.emit('sendMessage', message, () => setMessage(''));
   };
   // set room when list item clicked
-  const changeRoom = (e) => {
-    console.log('room change', e.target.value);
-    setRoom(e.target.value);
-  };
+
 
   /* render */
   return (
@@ -86,11 +99,11 @@ const Messages = ({ authStatus }) => {
         <Col style={{ marginTop: '30vh', fontSize: '1.2rem', lineHeight: '1.1' }}>
           <h2>Inbox</h2>
           <ListGroup variant="flush">
-            {/* {chatPartners} */}
+            {chatPartners}
             <ListGroup.Item>
               <Button value="id1" onClick={changeRoom}>
                 Room 1
-              </Button>
+                </Button>
             </ListGroup.Item>
             <ListGroup.Item>
               <Button value="id1" onClick={changeRoom}>

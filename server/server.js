@@ -15,6 +15,7 @@ const submitRouter = require('./Routers/submitRouter');
 const loginRouter = require('./Routers/loginRouter');
 const profileRouter = require('./Routers/profileRouter');
 const sessionRouter = require('./Routers/sessionRouter');
+const chatRouter = require('./Routers/chatRouter')
 
 // PASSPORT
 const { authenticateUser, serializeUser, deserializeUser } = require('./passport.js');
@@ -105,6 +106,7 @@ app.use('/api/explore', exploreRouter);
 app.use('/api/submit', submitRouter);
 app.use('/api/profile', profileRouter);
 app.use('/api/session', sessionRouter);
+app.use('/api/messages', chatRouter)
 
 // 404 catch all error handler
 app.use('*', (req, res) => res.sendStatus(404));
