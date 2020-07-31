@@ -2,13 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import { Container, ListGroup, Row, Col, Button } from 'react-bootstrap';
 import io from 'socket.io-client';
+import { getMessageRooms } from '../../server/Controllers/chatController';
 
 // const IDs = ['room1', 'room2', 'room3']
 
 let socket;
 const Messages = ({ authStatus }) => {
   const ENDPOINT = 'localhost:3000';
-  const username = authStatus.username || 'developer';
+  const name = authStatus.username;
   // const { loaded, setLoaded } = useState('');
   const [messageRooms, setMessageRooms] = useState([]);
   // currentRoom is the message_id, references 2 particpants
@@ -20,20 +21,23 @@ const Messages = ({ authStatus }) => {
   const [message, setMessage] = useState('');
   // const [room, setRoom] = useState('')
   // const [chatPartners, setChatPartners] = useState('')
-
   /** On component mount or room change **
    * 1. fetch list of messageRooms (IDs and partners) from DB - use to render message rooms
    * 2. map over list; for each room, render a list item with value === messageRoom id
    */
   useEffect(() => {
+    console.log('name', name)
     // fetch data for list of messagesRooms and current room
     fetchData();
     socket = io(ENDPOINT);
     // emit 'join' event to server
-    socket.emit('join', { username, room }, ({ error }) => {
+    socket.emit('join', { name, room }, ({ error }) => {
 
       console.log('Error joining room', error);
     });
+    socket.on('join', () => {
+      // getMessages()
+    })
     // on disconnectioning from socket or leaving the current room
     return () => {
       socket.emit('disconnect');
@@ -56,7 +60,7 @@ const Messages = ({ authStatus }) => {
 
   // on mount, fetch message data
   const fetchData = () => {
-    fetch(`api/messages/${username}`)
+    fetch(`api/messages/${name}`)
     .then(res => res.json())
     .then(data => {
       console.log('data', data)
@@ -74,8 +78,8 @@ const Messages = ({ authStatus }) => {
 
   // create a list item for each messaging pair
   const chatPartners = messageRooms.map((room) => {
-      let receiver = room.users[0] === username ? room.users[1] : room.users[0];
-     return ( <ListGroup.Item key={room.id}><Button value={room.id} onClick={changeRoom}>
+      let receiver = room.users[0] === name ? room.users[1] : room.users[0];
+     return ( <ListGroup.Item key={room._id}><Button value={room._id} onClick={changeRoom}>
         {receiver}
         </Button>
       </ListGroup.Item> )
@@ -88,8 +92,15 @@ const Messages = ({ authStatus }) => {
     event.preventDefault();
     socket.emit('sendMessage', message, () => setMessage(''));
   };
-  // set room when list item clicked
 
+  // const getMessages = () => {
+  //   fetch(`api/messages/history/${name}`)
+  //   .then(res => res.json())
+  //   .then(data => {
+  //     console.log('history data', data)
+  //     setMessages(data); 
+  //   })
+  // };
 
   /* render */
   return (

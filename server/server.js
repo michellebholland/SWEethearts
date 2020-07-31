@@ -61,6 +61,7 @@ io.on('connection', (socket) => {
     if (error) return callback(error);
 
     socket.join(user.room); // joins user to room
+    socket.emit('join')
     socket.emit('message', {
       user: 'admin',
       text: `Hi, ${user.name}, you are now in room ${user.room}!`,
