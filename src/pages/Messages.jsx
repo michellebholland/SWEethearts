@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, ListGroup, Row, Col, Button } from 'react-bootstrap';
 import io from 'socket.io-client';
-import { getMessageRooms } from '../../server/Controllers/chatController';
 
 // const IDs = ['room1', 'room2', 'room3']
 
@@ -25,6 +24,20 @@ const Messages = ({ authStatus }) => {
    * 1. fetch list of messageRooms (IDs and partners) from DB - use to render message rooms
    * 2. map over list; for each room, render a list item with value === messageRoom id
    */
+ // on mount, fetch message data
+    const fetchData = () => {
+      console.log('fetching')
+      fetch(`api/messages/${name}`)
+      .then(res => res.json())
+      .then(data => {
+        console.log('data', data)
+        // const setRooms = Object.assign([], data)
+        setMessageRooms(data); // ? an array of objects, each with 2 props (both arrays)
+        // setChatPartners(getChatPartners())
+        // setLoaded(true);
+      })
+    };  
+
   useEffect(() => {
     console.log('name', name)
     // fetch data for list of messagesRooms and current room
@@ -58,18 +71,7 @@ const Messages = ({ authStatus }) => {
 
   /* Method Defs */
 
-  // on mount, fetch message data
-  const fetchData = () => {
-    fetch(`api/messages/${name}`)
-    .then(res => res.json())
-    .then(data => {
-      console.log('data', data)
-      // const setRooms = Object.assign([], data)
-      setMessageRooms(data); // ? an array of objects, each with 2 props (both arrays)
-      // setChatPartners(getChatPartners())
-      // setLoaded(true);
-    })
-  };
+ 
 
   const changeRoom = (e) => {
     console.log('room change', e.target.value);

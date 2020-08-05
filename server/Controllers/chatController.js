@@ -3,6 +3,7 @@ const MessageRoom = require('../Models/chatModel.js')
 const chatController = {};
 
 chatController.getMessageRooms = (req, res, next) => {
+  console.log(req.params)
   const { username } = req.params;
   // find all message rooms for current user
   MessageRoom.find({users: username}, (err, found) => {
