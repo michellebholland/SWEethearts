@@ -24,33 +24,30 @@ const Messages = ({ authStatus }) => {
    * 1. fetch list of messageRooms (IDs and partners) from DB - use to render message rooms
    * 2. map over list; for each room, render a list item with value === messageRoom id
    */
- // on mount, fetch message data
-    const fetchData = () => {
-      console.log('fetching')
-      fetch(`api/messages/${name}`)
-      .then(res => res.json())
-      .then(data => {
-        console.log('data', data)
+  // on mount, fetch message data
+  const fetchData = () => {
+
+    fetch(`api/messages/${name}`)
+      .then((res) => res.json())
+      .then((data) => {
         // const setRooms = Object.assign([], data)
         setMessageRooms(data); // ? an array of objects, each with 2 props (both arrays)
         // setChatPartners(getChatPartners())
         // setLoaded(true);
-      })
-    };  
+      });
+  };
 
   useEffect(() => {
-    console.log('name', name)
     // fetch data for list of messagesRooms and current room
     fetchData();
     socket = io(ENDPOINT);
     // emit 'join' event to server
     socket.emit('join', { name, room }, ({ error }) => {
-
       console.log('Error joining room', error);
     });
     socket.on('join', () => {
       // getMessages()
-    })
+    });
     // on disconnectioning from socket or leaving the current room
     return () => {
       socket.emit('disconnect');
@@ -64,28 +61,29 @@ const Messages = ({ authStatus }) => {
   useEffect(() => {
     // listen for 'message' event (returned message is an object with 'user' and 'text' props)
     socket.on('message', (message) => {
-      console.log(message);
+
       setMessages([...messages, message]);
     });
   }, [messages]);
 
   /* Method Defs */
 
- 
-
   const changeRoom = (e) => {
-    console.log('room change', e.target.value);
+    // console.log('room change', e.target.value);
     setRoom(e.target.value);
   };
 
   // create a list item for each messaging pair
   const chatPartners = messageRooms.map((room) => {
-      let receiver = room.users[0] === name ? room.users[1] : room.users[0];
-     return ( <ListGroup.Item key={room._id}><Button value={room._id} onClick={changeRoom}>
-        {receiver}
+    const receiver = room.users[0] === name ? room.users[1] : room.users[0];
+    return (
+      <ListGroup.Item key={room._id}>
+        <Button value={`MongoDB ID: ${room._id}`} onClick={changeRoom}>
+          {receiver}
         </Button>
-      </ListGroup.Item> )
-  })
+      </ListGroup.Item>
+    );
+  });
 
   // track text input in state
   const handleChange = (e) => setMessage(e.target.value);
@@ -100,7 +98,7 @@ const Messages = ({ authStatus }) => {
   //   .then(res => res.json())
   //   .then(data => {
   //     console.log('history data', data)
-  //     setMessages(data); 
+  //     setMessages(data);
   //   })
   // };
 
@@ -114,22 +112,22 @@ const Messages = ({ authStatus }) => {
           <ListGroup variant="flush">
             {chatPartners}
             <ListGroup.Item>
-              <Button value="id1" onClick={changeRoom}>
+              <Button value="hardcoded ID: 1" onClick={changeRoom}>
                 Room 1
-                </Button>
+              </Button>
             </ListGroup.Item>
             <ListGroup.Item>
-              <Button value="id1" onClick={changeRoom}>
+              <Button value="hardcoded ID: 2" onClick={changeRoom}>
                 Room 2
               </Button>
             </ListGroup.Item>
             <ListGroup.Item>
-              <Button value="id1" onClick={changeRoom}>
+              <Button value="hardcoded ID: 3" onClick={changeRoom}>
                 Room 3
               </Button>
             </ListGroup.Item>
             <ListGroup.Item>
-              <Button value="id1" onClick={changeRoom}>
+              <Button value="hardcoded ID: 4" onClick={changeRoom}>
                 Room 4
               </Button>
             </ListGroup.Item>

@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 
 const { MONGO_URI } = process.env;
 
-mongoose.connect(MONGO_URI, {
+mongoose
+  .connect(MONGO_URI, {
     // options for the connect method to parse the URI
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -14,17 +15,19 @@ mongoose.connect(MONGO_URI, {
 
 const { Schema } = mongoose;
 
-// define message room schema
+// each MessageRoom instance contains data for single chat pair
 const messageRoomSchema = new Schema({
   users: [{ type: String, required: true }],
-  // messages: ? separate schema to store each message object? 
-  messages: [{
-    sender: {type: String, required: true},
-    text: { 
-      type: String,
-      max: 2000
+// all messages for a single pair of users
+  messages: [
+    {
+      sender: { type: String, required: true },
+      text: {
+        type: String,
+        max: 2000,
+      },
     },
-  }]
+  ],
 });
 
 const MessageRoom = mongoose.model('messageRoom', messageRoomSchema);
